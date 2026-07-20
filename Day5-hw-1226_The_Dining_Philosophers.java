@@ -1,13 +1,12 @@
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Semaphore;
 
 class DiningPhilosophers {
-
-    private Lock[] forks = new Lock[5];
+    private final Semaphore[] forks = new Semaphore[5];
+    private final Semaphore maxPhilosophersEating = new Semaphore(4);
 
     public DiningPhilosophers() {
         for (int i = 0; i < 5; i++) {
-            forks[i] = new ReentrantLock();
+            forks[i] = new Semaphore(1);
         }
     }
 
@@ -22,26 +21,29 @@ class DiningPhilosophers {
         int left = philosopher;
         int right = (philosopher + 1) % 5;
 
-        // Avoid deadlock
-        if (philosopher % 2 == 0) {
-            forks[left].lock();
-            forks[right].lock();
-        } else {
-            forks[right].lock();
-            forks[left].lock();
-        }
+        
+        maxPhilosophersEating.acquire();
 
-        try {
-            pickLeftFork.run();
-            pickRightFork.run();
+        
+        forks[left].acquire();
+        forks[right].acquire();
 
-            eat.run();
+        
+        pickLeftFork.run();
+        pickRightFork.run();
 
-            putLeftFork.run();
-            putRightFork.run();
-        } finally {
-            forks[left].unlock();
-            forks[right].unlock();
-        }
+        
+        eat.run();
+
+        
+        forks[left].release();
+        forks[right].release();
+
+        
+        putLeftFork.run();
+        putRightFork.run();
+
+    
+        maxPhilosophersEating.release();
     }
 }
