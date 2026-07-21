@@ -2,7 +2,6 @@ import java.util.concurrent.Semaphore;
 
 class DiningPhilosophers {
     private final Semaphore[] forks = new Semaphore[5];
-    private final Semaphore maxPhilosophersEating = new Semaphore(4);
 
     public DiningPhilosophers() {
         for (int i = 0; i < 5; i++) {
@@ -21,29 +20,25 @@ class DiningPhilosophers {
         int left = philosopher;
         int right = (philosopher + 1) % 5;
 
-        
-        maxPhilosophersEating.acquire();
+        // To avoid deadlock: odd philosophers pick right first, even pick left first
+        if (philosopher % 2 == 0) {
+            forks[left].acquire();
+            forks[right].acquire();
+        } else {
+            forks[right].acquire();
+            forks[left].acquire();
+        }
 
-        
-        forks[left].acquire();
-        forks[right].acquire();
-
-        
+        // Actions
         pickLeftFork.run();
         pickRightFork.run();
-
-        
         eat.run();
-
-        
-        forks[left].release();
-        forks[right].release();
-
-        
         putLeftFork.run();
         putRightFork.run();
 
-    
-        maxPhilosophersEating.release();
+        // Release forks
+        forks[left].release();
+        forks[right].release();
     }
 }
+
