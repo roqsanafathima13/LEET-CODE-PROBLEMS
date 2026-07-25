@@ -1,31 +1,28 @@
-class ParkingSystem {
-    private int bigSlots;
-    private int mediumSlots;
-    private int smallSlots;
-
-    public ParkingSystem(int big, int medium, int small) {
-        bigSlots = big;
-        mediumSlots = medium;
-        smallSlots = small;
-    }
-
-    public boolean addCar(int carType) {
-        if (carType == 1) { // big
-            if (bigSlots > 0) {
-                bigSlots--;
-                return true;
-            }
-        } else if (carType == 2) { // medium
-            if (mediumSlots > 0) {
-                mediumSlots--;
-                return true;
-            }
-        } else if (carType == 3) { // small
-            if (smallSlots > 0) {
-                smallSlots--;
-                return true;
-            }
-        }
-        return false;
-    }
+class ParkingSystem {  
+    private int b = 0,m = 0,s = 0;  
+    int bigcount = 0,medcount = 0,smallcount = 0;  
+    public ParkingSystem(int big, int medium, int small) {  
+        this.b = big;  
+        this.m = medium;  
+        this.s = small;  
+    }  
+    public boolean addCar(int carType) {  
+         
+         if(carType == 1){  
+            bigcount+=1;  
+            boolean check = bigcount<=b ? true:false;  
+            return check;  
+         }  
+            if(carType == 2){  
+                medcount+=1;  
+                boolean check = medcount<=m ? true:false;  
+            return check;  
+            }  
+            if(carType == 3){  
+                smallcount+=1;  
+                boolean check = smallcount<=s ? true:false;  
+            return check;  
+            }  
+            return true;  
+    }  
 }
