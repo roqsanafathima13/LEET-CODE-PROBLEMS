@@ -1,27 +1,29 @@
-import java.util.*;
-class UndergroundSystem {
-    private Map<Integer, String[]> checkIns; 
-    private Map<String, double[]> routeData; 
-    public UndergroundSystem() {
-        checkIns = new HashMap<>();
-        routeData = new HashMap<>();
-    }
-    public void checkIn(int id, String stationName, int t) {
-        checkIns.put(id, new String[]{stationName, String.valueOf(t)});
-    }
-    public void checkOut(int id, String stationName, int t) {
-        String[] checkInData = checkIns.remove(id);
-        String startStation = checkInData[0];
-        int startTime = Integer.parseInt(checkInData[1]);
-        String route = startStation + "->" + stationName;
-        int travelTime = t - startTime;
-        routeData.putIfAbsent(route, new double[2]);
-        routeData.get(route)[0] += travelTime; // total time
-        routeData.get(route)[1] += 1;          // trip count
-    }
-    public double getAverageTime(String startStation, String endStation) {
-        String route = startStation + "->" + endStation;
-        double[] data = routeData.get(route);
-        return data[0] / data[1];
-    }
-}
+class UndergroundSystem {  
+    Map<Integer, Pair<String, Integer>> checkInMap = new HashMap<>();   
+    Map<String, Pair<Double, Integer>> routeMap = new HashMap<>();  
+ 
+    public UndergroundSystem() {}  
+  
+    public void checkIn(int id, String stationName, int t) {  
+        checkInMap.put(id, new Pair<>(stationName, t));  
+    }  
+  
+    public void checkOut(int id, String stationName, int t) {  
+        Pair<String, Integer> checkIn = checkInMap.get(id);  
+        checkInMap.remove(id);  
+  
+        String routeName = checkIn.getKey() + "_" + stationName;  
+        int totalTime = t - checkIn.getValue();  
+  
+        Pair<Double, Integer> route = routeMap.getOrDefault(routeName, new  
+Pair<>(0.0, 0));  
+        routeMap.put(routeName, new Pair<>(route.getKey() + totalTime,  
+route.getValue() + 1));  
+    }  
+  
+    public double getAverageTime(String startStation, String endStation) {  
+        String routeName = startStation + "_" + endStation;  
+        Pair<Double, Integer> trip = routeMap.get(routeName);  
+        return trip.getKey() / trip.getValue();  
+    }  
+} 
